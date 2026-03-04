@@ -56,6 +56,11 @@ HOME_FAVORITES_DIR = os.path.join(ROOT_DIR, "assets", "home-favorites")
 HOME_FAVORITES_INDEX_FILE = os.path.join(HOME_FAVORITES_DIR, "index.json")
 HOME_FAVORITES_MAX = 30
 ASSET_POSITIONS_FILE = os.path.join(ROOT_DIR, "asset-positions.json")
+
+# 性能保护：默认关闭“每次打开页面随机换背景”，避免首页首屏被磁盘复制拖慢
+AUTO_ROTATE_HOME_ON_PAGE_OPEN = (os.getenv("AUTO_ROTATE_HOME_ON_PAGE_OPEN", "0").strip().lower() in {"1", "true", "yes", "on"})
+AUTO_ROTATE_MIN_INTERVAL_SECONDS = int(os.getenv("AUTO_ROTATE_MIN_INTERVAL_SECONDS", "60"))
+_last_home_rotate_at = 0
 ASSET_DEFAULTS_FILE = os.path.join(ROOT_DIR, "asset-defaults.json")
 RUNTIME_CONFIG_FILE = os.path.join(ROOT_DIR, "runtime-config.json")
 
@@ -189,7 +194,8 @@ if not os.path.exists(STATE_FILE):
 @app.route("/", methods=["GET"])
 def index():
     """Serve the pixel office UI with built-in version cache busting"""
-    # 每次打开页面时，随机应用一张收藏地图（若存在）
+    # 默认禁用页面打开即换背景，避免首屏慢
+    # 如需启用，可配置 AUTO_ROTATE_HOME_ON_PAGE_OPEN=1
     _maybe_apply_random_home_favorite()
 
     with open(os.path.join(FRONTEND_DIR, "index.html"), "r", encoding="utf-8") as f:
@@ -297,7 +303,16 @@ def _save_home_favorites_index(data):
 
 def _maybe_apply_random_home_favorite():
     """On page open, randomly apply one saved home favorite if available."""
+    global _last_home_rotate_at
+
+    if not AUTO_ROTATE_HOME_ON_PAGE_OPEN:
+        return False, "disabled"
+
     try:
+        now_ts = datetime.now().timestamp()
+        if _last_home_rotate_at and (now_ts - _last_home_rotate_at) < AUTO_ROTATE_MIN_INTERVAL_SECONDS:
+            return False, "throttled"
+
         idx = _load_home_favorites_index()
         items = idx.get("items") or []
         candidates = []
@@ -318,6 +333,7 @@ def _maybe_apply_random_home_favorite():
             return False, "missing-office-bg"
 
         shutil.copy2(src, str(target))
+        _last_home_rotate_at = now_ts
         return True, rel
     except Exception as e:
         return False, str(e)
