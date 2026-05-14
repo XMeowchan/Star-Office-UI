@@ -1,0 +1,77 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/codex_star_office_hook.py SessionStart",
+            "timeout": 10,
+            "statusMessage": "Syncing Star Office state"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/codex_star_office_hook.py UserPromptSubmit",
+            "timeout": 10,
+            "statusMessage": "Updating Star Office state"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/codex_star_office_hook.py PreToolUse",
+            "timeout": 10,
+            "statusMessage": "Updating Star Office state"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/codex_star_office_hook.py PostToolUse",
+            "timeout": 10,
+            "statusMessage": "Updating Star Office state"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/codex_star_office_hook.py PermissionRequest",
+            "timeout": 10,
+            "statusMessage": "Updating Star Office state"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/codex_star_office_hook.py Stop",
+            "timeout": 10,
+            "statusMessage": "Updating Star Office state"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -64,6 +64,11 @@ python3 set_state.py idle "待命中"
 ### 有 OpenClaw / AI Agent 的用户
 这是**完整体验**。Agent 在工作时自动切换状态，办公室里的像素角色会实时走到对应区域——你只需要打开网页，就能看到 AI 此刻在做什么。
 
+### 有 Codex 的用户
+本定制版内置了 Codex hooks 支持。Codex 在当前仓库里工作时，可以自动把会话启动、收到任务、执行工具、等待授权、任务结束等事件同步到 Star Office。
+
+详细说明见 [docs/codex-integration.md](./docs/codex-integration.md)。
+
 ### 没有 OpenClaw 的用户
 也完全可以部署。你可以：
 - 用 `set_state.py` 或 API 手动 / 脚本推送状态
